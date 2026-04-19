@@ -1,0 +1,285 @@
+/* ==============================================
+   LibraryPro — Premium SaaS Design System
+   Standardised UI for Login, Register, & Dashboards
+   ============================================== */
+
+/* ── Google Fonts (Premium Choice: Poppins & Inter) ── */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+  /* ── Light Mode (SaaS Premium) ── */
+  --bg-body        : #F4F7FE;
+  --bg-card        : #FFFFFF;
+  --bg-sidebar     : #FFFFFF;
+  --text-main      : #2B3674;
+  --text-muted     : #A3AED0;
+  --border-color   : #E0E5F2;
+  
+  --primary-accent : #4318FF; /* Electric Blue */
+  --primary-gradient: linear-gradient(135deg, #4318FF 0%, #5E37FF 100%);
+  --sidebar-shadow : 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+  --card-shadow    : 0px 20px 40px rgba(0, 0, 0, 0.05);
+  
+  --radius-sm      : 8px;
+  --radius-md      : 12px;
+  --radius-lg      : 15px;
+  --radius-pill    : 50px;
+  
+  --transition     : all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --sidebar-width  : 280px;
+}
+
+.dark-mode {
+  /* ── Dark Mode (SaaS Premium) ── */
+  --bg-body        : #0B1437;
+  --bg-card        : #111C44;
+  --bg-sidebar     : #111C44;
+  --text-main      : #FFFFFF;
+  --text-muted     : #707EAE;
+  --border-color   : #1B254B;
+  
+  --sidebar-shadow : none;
+  --card-shadow    : 0px 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Global Resets ── */
+body {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 14px;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  margin: 0;
+  transition: var(--transition);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+a {
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+/* ── Layout Structures ── */
+.app-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  margin-left: 0; /* Updated via JS/Media Queries */
+  transition: var(--transition);
+}
+
+/* ── Component Standards ── */
+.premium-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  padding: 1.5rem;
+  transition: var(--transition);
+}
+
+.premium-card:hover {
+  transform: translateY(-5px);
+}
+
+/* ── Buttons (Pill & Gradient) ── */
+.btn-pill {
+  border-radius: var(--radius-pill);
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: var(--transition);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary-pill {
+  background: var(--primary-gradient);
+  color: white !important;
+  box-shadow: 0px 4px 15px rgba(67, 24, 255, 0.3);
+}
+
+.btn-primary-pill:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 8px 25px rgba(67, 24, 255, 0.45);
+}
+
+/* ── Sidebar Styling ── */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  box-shadow: var(--sidebar-shadow);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+}
+
+.sidebar-logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary-accent);
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.nav-item-pill {
+  margin-bottom: 0.5rem;
+}
+
+.nav-link-pill {
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-weight: 600;
+  gap: 1rem;
+}
+
+.nav-link-pill i {
+  font-size: 1.2rem;
+}
+
+.nav-link-pill:hover, .nav-link-pill.active {
+  background: var(--bg-body);
+  color: var(--primary-accent);
+}
+
+.nav-link-pill.active {
+  border-right: 4px solid var(--primary-accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: transparent;
+}
+
+/* ── Tables (SaaS Standard) ── */
+.premium-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+}
+
+.premium-table thead th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.premium-table tbody tr {
+  background: var(--bg-card);
+  transition: var(--transition);
+}
+
+.premium-table tbody tr:hover {
+  background: var(--bg-body) !important;
+}
+
+.premium-table td {
+  padding: 1.25rem 1rem;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* ── Authentication Pages (Login/Register) ── */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-body);
+  padding: 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 3rem;
+  text-align: center;
+}
+
+.auth-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+/* ── Floating Toggle for Auth Pages ── */
+.theme-toggle-fixed {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 1050;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+  color: var(--text-main);
+}
+
+/* ── Animations ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-up {
+  animation: slideUp 0.5s ease forwards;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.show {
+    transform: translateX(0);
+  }
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+@media (min-width: 992px) {
+  .main-content {
+    margin-left: var(--sidebar-width);
+  }
+}

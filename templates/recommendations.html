@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Magic Picks | LibraryPro Premium</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <!-- Sidebar (Consistent across portal) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <i class="bi bi-lightning-charge-fill"></i>
+        <span>LibraryPro</span>
+      </div>
+      
+      <ul class="sidebar-nav">
+        <li class="nav-item-pill">
+          <a href="{{ url_for('dashboard') }}" class="nav-link-pill">
+            <i class="bi bi-grid-fill"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item-pill">
+          <a href="{{ url_for('recommendations') }}" class="nav-link-pill active">
+            <i class="bi bi-stars"></i>
+            <span>Magic Picks</span>
+          </a>
+        </li>
+        {% if role != 'guest' %}
+        <li class="nav-item-pill">
+          <a href="{{ url_for('profile') }}" class="nav-link-pill">
+            <i class="bi bi-person-circle"></i>
+            <span>Profile</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+
+      <div class="mt-auto">
+        <div id="theme-toggle" class="nav-link-pill mb-2 cursor-pointer" style="cursor: pointer;">
+          <i class="bi bi-sun-fill theme-sun d-none"></i>
+          <i class="bi bi-moon-stars-fill theme-moon"></i>
+          <span>Switch Theme</span>
+        </div>
+        <a href="{{ url_for('logout') }}" class="nav-link-pill text-danger">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Sign Out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header Toggle -->
+      <div class="d-lg-none mb-4">
+        <button class="btn btn-pill bg-white shadow-sm" onclick="document.getElementById('sidebar').classList.toggle('show')">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+      </div>
+
+      <!-- Page Header -->
+      <header class="mb-5 animate-up">
+        <h2 class="mb-1">Magic Picks ✨</h2>
+        <p class="text-muted small">Curated recommendations based on your reading DNA.</p>
+      </header>
+
+      {% if not recs.category_picks and not recs.trending and not recs.author_picks %}
+      <div class="premium-card text-center py-5 animate-up">
+        <div class="btn-pill bg-light text-muted p-0 d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+          <i class="bi bi-stars fs-1"></i>
+        </div>
+        <h4>No Data Points Yet</h4>
+        <p class="text-muted">Start borrowing books to unlock your personalized recommendations.</p>
+        <a href="{{ url_for('dashboard') }}" class="btn-pill btn-primary-pill mt-3">Browse Inventory</a>
+      </div>
+      {% endif %}
+
+      <!-- Category Hero Picks -->
+      {% if recs.category_picks %}
+      <section class="mb-5 animate-up" style="animation-delay: 0.1s">
+        <h4 class="mb-4">Because you love <span class="badge bg-primary-subtle text-primary border-0 rounded-pill px-3">{{ recs.top_category }}</span></h4>
+        <div class="row g-4">
+          {% for book in recs.category_picks[:4] %}
+          <div class="col-xl-3 col-md-6">
+            <div class="premium-card h-100 d-flex flex-column">
+              <div class="mb-3 d-flex justify-content-between align-items-center">
+                <span class="badge bg-light text-muted border-0 small px-2">Best in Category</span>
+                <i class="bi bi-star-fill text-warning"></i>
+              </div>
+              <h5 class="fw-bold mb-1">{{ book.title }}</h5>
+              <p class="text-muted small mb-4">by {{ book.author }}</p>
+              
+              <div class="mt-auto d-flex align-items-center justify-content-between">
+                <span class="small fw-bold {{ 'text-success' if book.available_qty > 0 else 'text-danger' }}">
+                  {{ book.available_qty }} Avail
+                </span>
+                <form method="POST" action="{{ url_for('issue_book', book_id=book.id) }}">
+                  <button type="submit" class="btn-pill btn-primary-pill py-2 px-3" 
+                          {% if role == 'guest' %}disabled{% endif %}>
+                    Issue
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      <!-- Trending Section -->
+      {% if recs.trending %}
+      <section class="mb-5 animate-up" style="animation-delay: 0.2s">
+        <h4 class="mb-4">Trending in Library</h4>
+        <div class="row g-4">
+          {% for book in recs.trending[:4] %}
+          <div class="col-xl-3 col-md-6">
+            <div class="premium-card h-100 d-flex flex-column" style="border-left: 4px solid #f59e0b">
+              <div class="mb-3 d-flex justify-content-between">
+                <span class="badge bg-warning-subtle text-warning border-0 small px-2">Popular</span>
+                <span class="text-muted small">#{{ loop.index }}</span>
+              </div>
+              <h5 class="fw-bold mb-1">{{ book.title }}</h5>
+              <p class="text-muted small mb-4">by {{ book.author }}</p>
+              
+              <div class="mt-auto d-flex align-items-center justify-content-between">
+                <div class="text-muted small">Rack: {{ book.rack_no or 'A-1' }}</div>
+                <form method="POST" action="{{ url_for('issue_book', book_id=book.id) }}">
+                  <button type="submit" class="btn-pill btn-primary-pill py-2 px-3" 
+                          {% if role == 'guest' %}disabled{% endif %}>
+                    Get it
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      <!-- Author Highlights -->
+      {% if recs.author_picks %}
+      <section class="animate-up" style="animation-delay: 0.3s">
+        <h4 class="mb-4">From your Favorite Author</h4>
+        <div class="row g-4">
+          {% for book in recs.author_picks[:4] %}
+          <div class="col-xl-3 col-md-6">
+            <div class="premium-card h-100 d-flex flex-column">
+              <div class="mb-3 d-flex justify-content-between">
+                <span class="badge bg-success-subtle text-success border-0 small px-2">{{ book.author }}</span>
+              </div>
+              <h5 class="fw-bold mb-1">{{ book.title }}</h5>
+              <p class="text-muted small mb-4">A must read</p>
+              
+              <div class="mt-auto">
+                <form method="POST" action="{{ url_for('issue_book', book_id=book.id) }}">
+                  <button type="submit" class="btn-pill btn-primary-pill w-100 py-2" 
+                          {% if role == 'guest' %}disabled{% endif %}>
+                    Issue Copy
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/theme_toggle.js') }}"></script>
+</body>
+</html>

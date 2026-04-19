@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | LibraryPro Premium</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <i class="bi bi-stack"></i>
+        <span>LibraryPro</span>
+      </div>
+      
+      <ul class="sidebar-nav">
+        <li class="nav-item-pill">
+          <a href="#stats" class="nav-link-pill active">
+            <i class="bi bi-grid-fill"></i>
+            <span>Overview</span>
+          </a>
+        </li>
+        <li class="nav-item-pill">
+          <a href="#users" class="nav-link-pill">
+            <i class="bi bi-people-fill"></i>
+            <span>User Directory</span>
+          </a>
+        </li>
+        <li class="nav-item-pill">
+          <a href="#inventory" class="nav-link-pill">
+            <i class="bi bi-collection-fill"></i>
+            <span>Inventory</span>
+          </a>
+        </li>
+        <li class="nav-item-pill">
+          <a href="#transactions" class="nav-link-pill">
+            <i class="bi bi-activity"></i>
+            <span>Transactions</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="mt-auto">
+        <!-- Theme Toggle -->
+        <div id="theme-toggle" class="nav-link-pill mb-2 cursor-pointer" style="cursor: pointer;">
+          <i class="bi bi-sun-fill theme-sun d-none"></i>
+          <i class="bi bi-moon-stars-fill theme-moon"></i>
+          <span>Switch Theme</span>
+        </div>
+        <a href="{{ url_for('logout') }}" class="nav-link-pill text-danger">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Sign Out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header Toggle -->
+      <div class="d-lg-none mb-4">
+        <button class="btn btn-pill bg-white shadow-sm" onclick="document.getElementById('sidebar').classList.toggle('show')">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+      </div>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }} border-0 shadow-sm animate-up mb-4" role="alert">
+        {{ msg }}
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      <!-- Page Header -->
+      <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3 animate-up">
+        <h2 class="m-0" id="stats">Administrative Console</h2>
+        <button class="btn-pill btn-primary-pill" data-bs-toggle="modal" data-bs-target="#addBookModal">
+          <i class="bi bi-plus-lg"></i>
+          <span>Provision New Book</span>
+        </button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="row g-4 mb-5 animate-up" style="animation-delay: 0.1s">
+        <div class="col-md-3">
+          <div class="premium-card text-center py-4" style="border-bottom: 4.5px solid var(--primary-accent)">
+            <h3 class="fw-bold mb-1">{{ stats.total_students + stats.total_teachers }}</h3>
+            <span class="text-muted small fw-semibold">Total Active Users</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="premium-card text-center py-4" style="border-bottom: 4.5px solid #8b5cf6">
+            <h3 class="fw-bold mb-1">{{ stats.total_books }}</h3>
+            <span class="text-muted small fw-semibold">Library Volumes</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="premium-card text-center py-4" style="border-bottom: 4.5px solid #eab308">
+            <h3 class="fw-bold mb-1">{{ stats.active_issues }}</h3>
+            <span class="text-muted small fw-semibold">Active Book Loans</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="premium-card text-center py-4" style="border-bottom: 4.5px solid #10b981">
+            <h3 class="fw-bold mb-1">₹{{ stats.fines_collected }}</h3>
+            <span class="text-muted small fw-semibold">Recovered Capital</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tables Content -->
+      <div class="row g-5">
+        <!-- User Directory -->
+        <div class="col-xl-5 animate-up" style="animation-delay: 0.2s">
+          <h4 class="mb-4" id="users">User Directory</h4>
+          <div class="premium-card p-0 overflow-hidden shadow-sm" style="max-height: 500px; overflow-y: auto;">
+            <table class="premium-table mb-0">
+              <thead class="sticky-top bg-white">
+                <tr><th>Identity</th><th>Roll No</th><th class="text-center">Drop</th></tr>
+              </thead>
+              <tbody>
+                {% for u in users %}
+                <tr>
+                  <td>
+                    <div class="fw-bold">{{ u.name }}</div>
+                    <div class="text-muted small">{{ u.email }} | {{ u.role | capitalize }}</div>
+                  </td>
+                  <td class="font-monospace small opacity-75">{{ u.roll_no }}</td>
+                  <td class="text-center">
+                    <form method="POST" action="{{ url_for('delete_user', user_id=u.id) }}">
+                      <button type="submit" class="btn btn-pill bg-danger-subtle text-danger" onclick="return confirm('Wipe user {{ u.name }}?')">
+                        <i class="bi bi-person-x"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Inventory List -->
+        <div class="col-xl-7 animate-up" style="animation-delay: 0.3s">
+          <h4 class="mb-4" id="inventory">Global Inventory Database</h4>
+          <div class="premium-card p-0 overflow-hidden shadow-sm" style="max-height: 500px; overflow-y: auto;">
+            <table class="premium-table mb-0">
+              <thead class="sticky-top bg-white">
+                <tr><th>Title & Author</th><th>Details</th><th>Status</th><th class="text-center">Purge</th></tr>
+              </thead>
+              <tbody>
+                {% for b in books %}
+                <tr>
+                  <td style="max-width: 220px;">
+                    <div class="fw-bold text-truncate">{{ b.title }}</div>
+                    <div class="text-muted small">by {{ b.author }}</div>
+                  </td>
+                  <td>
+                    <div class="badge bg-light text-primary border-0 small px-2">{{ b.category }}</div>
+                    <div class="text-muted small mt-1">Rack: {{ b.rack_no or 'A-1' }}</div>
+                  </td>
+                  <td>
+                    <div class="fw-bold">{{ b.available_qty }} / {{ b.total_qty }}</div>
+                    <div class="small fw-semibold {{ 'text-success' if b.available_qty > 0 else 'text-danger' }}">
+                      {{ 'In Stock' if b.available_qty > 0 else 'Depleted' }}
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <form method="POST" action="{{ url_for('delete_book', book_id=b.id) }}">
+                      <button type="submit" class="btn btn-pill bg-danger-subtle text-danger" onclick="return confirm('Purge {{ b.title }}?')">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transactions Tracking -->
+      <div class="mt-5 animate-up" style="animation-delay: 0.4s">
+        <h4 class="mb-4" id="transactions">Audit & Transaction Trail</h4>
+        <div class="premium-card p-0 overflow-hidden">
+          <div class="table-responsive">
+            <table class="premium-table mb-0">
+              <thead>
+                <tr><th>ID</th><th>User</th><th>Asset Scanned</th><th>Issue/Due</th><th>Status</th><th>Fine</th></tr>
+              </thead>
+              <tbody>
+                {% for t in transactions %}
+                <tr>
+                  <td class="text-muted">#{{ t.id }}</td>
+                  <td>{{ t.user_name }}<br><small class="text-muted opacity-75">{{ t.unique_id }}</small></td>
+                  <td class="fw-bold text-primary">{{ t.book_title }}</td>
+                  <td>
+                    <div class="small fw-semibold">{{ t.issue_date }}</div>
+                    <div class="small text-muted">Due: {{ t.due_date }}</div>
+                  </td>
+                  <td>
+                    {% if t.status == 'issued' %}
+                    <span class="badge bg-warning-subtle text-warning border-0 px-3 py-1 rounded-pill">Issued</span>
+                    {% else %}
+                    <span class="badge bg-success-subtle text-success border-0 px-3 py-1 rounded-pill">Returned</span>
+                    {% endif %}
+                  </td>
+                  <td class="font-monospace fw-bold">₹{{ t.fine_amount }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Book Modal -->
+  <div class="modal fade" id="addBookModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content premium-card shadow-lg p-3">
+        <form method="POST" action="{{ url_for('add_book_route') }}">
+          <div class="modal-header border-0 pb-0">
+            <h4 class="modal-title fw-bold">Provision New Book</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body py-4">
+            <div class="mb-3 text-start">
+              <label class="form-label fw-bold small ms-1">Book Title</label>
+              <input type="text" name="title" class="form-control btn-pill bg-light border-0 px-4" placeholder="e.g., Core Java Volume I" required />
+            </div>
+            <div class="mb-3 text-start">
+              <label class="form-label fw-bold small ms-1">Author Name</label>
+              <input type="text" name="author" class="form-control btn-pill bg-light border-0 px-4" placeholder="e.g., Cay S. Horstmann" required />
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6 text-start">
+                <label class="form-label fw-bold small ms-1">Category</label>
+                <input type="text" name="category" class="form-control btn-pill bg-light border-0 px-4" placeholder="e.g., Computer Science" required />
+              </div>
+              <div class="col-6 text-start">
+                <label class="form-label fw-bold small ms-1">Total Copies</label>
+                <input type="number" name="qty" class="form-control btn-pill bg-light border-0 px-4" placeholder="e.g., 5" required />
+              </div>
+            </div>
+            <div class="row g-2 mb-1">
+              <div class="col-6 text-start">
+                <label class="form-label fw-bold small ms-1">ISBN (Optional)</label>
+                <input type="text" name="isbn" class="form-control btn-pill bg-light border-0 px-4" placeholder="e.g., 978-0137081899" />
+              </div>
+              <div class="col-6 text-start">
+                <label class="form-label fw-bold small ms-1">Shelf (Optional)</label>
+                <input type="text" name="rack_no" class="form-control btn-pill bg-light border-0 px-4" placeholder="e.g., A-101" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="submit" class="btn-pill btn-primary-pill w-100 py-3">Commit to Global Inventory</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/theme_toggle.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
